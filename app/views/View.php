@@ -5,10 +5,7 @@ namespace app\views;
 
 class View {
 
-    private $base;
-
     function __construct() {
-        //$this->base = $_SERVER['DOCUMENT_ROOT'];
     }
 
     public function render($name) {

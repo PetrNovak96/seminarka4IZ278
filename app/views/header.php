@@ -11,6 +11,10 @@
     <ul>
         <li><a href="index">Hlavní stránka</a></li>
         <li><a href="login">Přihlásit se</a></li>
+        <li><a href="index">Hlavní stránka</a></li>
+        <li><a href="login">Přihlásit se</a></li>
+        <li><a href="index">Hlavní stránka</a></li>
+        <li><a href="login">Přihlásit se</a></li>
     </ul>
 </div>
 
