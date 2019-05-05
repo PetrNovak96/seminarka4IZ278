@@ -3,7 +3,9 @@
     "description": "Semestrální práce do předmětu 4IZ278...",
     "type": "project",
     "license": "Apache",
-    "require": {},
+    "require": {
+        "ext-pdo": "*"
+    },
     "autoload": {
         "psr-4": {
             "app\\": "app"
