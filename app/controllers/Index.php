@@ -6,9 +6,9 @@ class Index extends Controller {
 
     function __construct() {
         parent::__construct();
-        $this->view->render('index/index');
-    }
-    function ahoj($parameters = false) {
     }
 
+    function defaultRender() {
+        $this->view->render('index/index');
+    }
 }

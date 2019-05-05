@@ -18,6 +18,8 @@ class Bootstrap {
                 if (isset($url[1]) && method_exists($instance, $url[1])) {
                     $parameters = array_slice($url, 2);
                     $instance->{$url[1]}($parameters);
+                } else {
+                    $instance->defaultRender();
                 }
             } else {
                 $error = new Error();
@@ -25,6 +27,7 @@ class Bootstrap {
             }
         } else {
             $index = new Index();
+            $index->defaultRender();
         }
     }
 }

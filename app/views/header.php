@@ -9,12 +9,9 @@
 <body>
 <div id="header">
     <ul>
-        <li><a href="index">Hlavní stránka</a></li>
-        <li><a href="login">Přihlásit se</a></li>
-        <li><a href="index">Hlavní stránka</a></li>
-        <li><a href="login">Přihlásit se</a></li>
-        <li><a href="index">Hlavní stránka</a></li>
-        <li><a href="login">Přihlásit se</a></li>
+        <li><a href="employees">Pracovníci</a></li>
+        <li><a href="departments">Oddělení</a></li>
+        <li><a href="events">Akce</a></li>
     </ul>
 </div>
 

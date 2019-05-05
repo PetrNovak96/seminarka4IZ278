@@ -14,4 +14,9 @@ class Error extends Controller {
         $this->view->msg = 'Page does not exists';
         $this->view->render('error/index');
     }
+
+    function defaultRender() {
+        $this->view->msg = 'Something went wrong ... :(';
+        $this->view->render('error/index');
+    }
 }
