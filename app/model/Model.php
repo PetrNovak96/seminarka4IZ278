@@ -11,7 +11,7 @@ abstract class Model {
 
     public function __construct(){
         if (!self::$pdo instanceof PDO){
-            self::$pdo= new PDO(
+            self::$pdo = new PDO(
                 DB_CONNECTION,
                 DB_USERNAME,
                 DB_PASSWORD);

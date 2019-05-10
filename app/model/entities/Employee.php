@@ -10,12 +10,11 @@ namespace app\model\entities;
  * @property string $name
  * @property string $surname
  * @property string $birth
- * @property string $begin
+ * @property string $entered
  * @property string $left
  * @property string $email
  */
 class Employee {
-
 
 
 }

@@ -15,6 +15,12 @@ class Departments extends EntityController {
     }
 
     function detail($parameters) {
-        // TODO: Implement detail() method.
+        $id = $parameters[0];
+        $this->view->ID = $id;
+        $this->view->render('departments/detail');
+    }
+
+    function create() {
+        $this->view->render('departments/form');
     }
 }

@@ -16,6 +16,12 @@ class Employees extends EntityController {
     }
 
     function detail($parameters) {
-        // TODO: Implement detail() method.
+        $id = $parameters[0];
+        $this->view->ID = $id;
+        $this->view->render('employees/detail');
+    }
+
+    function create() {
+        $this->view->render('employees/form');
     }
 }

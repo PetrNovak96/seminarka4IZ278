@@ -15,6 +15,12 @@ class Events extends EntityController {
     }
 
     function detail($parameters) {
-        // TODO: Implement detail() method.
+        $id = $parameters[0];
+        $this->view->ID = $id;
+        $this->view->render('events/detail');
+    }
+
+    function create() {
+        $this->view->render('events/form');
     }
 }
