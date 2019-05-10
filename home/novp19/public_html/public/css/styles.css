@@ -1,0 +1,33 @@
+
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #649df2;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: inline-block;
+    color: whitesmoke;
+    font-weight: bold;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: whitesmoke;
+    color: #649df2;
+}
+
+#footer {
+    background: black;
+    color: white;
+}

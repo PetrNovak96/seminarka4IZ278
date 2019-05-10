@@ -18,3 +18,9 @@
 </div>
 
 <div id="content">
+<div class="container">
+    <table class="table table-bordered table-striped table-hover">
+        <th>
+
+        </th>
+    </table>
