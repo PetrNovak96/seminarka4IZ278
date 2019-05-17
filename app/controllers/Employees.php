@@ -3,25 +3,20 @@
 
 namespace app\controllers;
 
-
 class Employees extends EntityController {
 
-    function __construct() {
-        parent::__construct();
+    function __construct($name) {
+        $deletedMsg = 'Úspěšně byla provedena výpověď.';
+        $deleteErrorMsg = 'Nepodařilo se provést výpověď.';
+        $updatedMsg = 'Údaje pracovníka byly úspěšně upraveny.';
+        $createdMsg = 'Byl vytvořen nový záznam pracovníka.';
 
-    }
-
-    function defaultRender() {
-        $this->view->render('employees/index');
-    }
-
-    function detail($parameters) {
-        $id = $parameters[0];
-        $this->view->ID = $id;
-        $this->view->render('employees/detail');
-    }
-
-    function create() {
-        $this->view->render('employees/form');
+        parent::__construct(
+            $name,
+            $deletedMsg,
+            $deleteErrorMsg,
+            $updatedMsg,
+            $createdMsg
+        );
     }
 }

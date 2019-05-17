@@ -2,11 +2,15 @@
     <?php
     $employeesModel = new \app\model\EmployeesModel();
     $employee = $employeesModel->findEmployee($this->ID);
+    $this->render('components/statusBar');
+    $this->link = 'employees';
+    $this->type = 'pracovníka';
+    $this->render('components/detailBtnGroup');
     ?>
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <h1>
-                <?php echo $employee['NAME'].' '.$employee['SURNAME']; ?>
+                <?php echo htmlspecialchars($employee['NAME'].' '.$employee['SURNAME']); ?>
             </h1>
             <h3 class="text-right">
                 <a class="card-link" href="#depTable" data-toggle="collapse">Oddělení</a>
@@ -19,7 +23,7 @@
                 foreach ($departments as $department) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="departments/detail/'.$department['ID'].'/">';
-                    echo $department['NAME'].'</a></td>';
+                    echo htmlspecialchars($department['NAME']).'</a></td>';
                     echo '</tr>';
                 }
                 ?>
@@ -36,7 +40,7 @@
                 foreach ($events as $event) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="events/detail/'.$event['ID'].'/">';
-                    echo $event['NAME'].'</a></td>';
+                    echo htmlspecialchars($event['NAME']).'</a></td>';
                     echo '</tr>';
                 }
                 ?>
@@ -46,7 +50,7 @@
             <table class="table table-striped table-hover informace">
                 <tr>
                     <td>Email:</td>
-                    <td><?php echo $employee['EMAIL']; ?></td>
+                    <td><?php echo htmlspecialchars($employee['EMAIL']); ?></td>
                 </tr>
                 <tr>
                     <td>Věk:</td>
@@ -55,7 +59,7 @@
                 <?php if ($employee['ENTERED']): ?>
                 <tr>
                     <td>Nastoupil:</td>
-                    <td><?php echo $employee['ENTERED']; ?></td>
+                    <td><?php echo format_date($employee['ENTERED']); ?></td>
                 </tr>
                 <?php endif; ?>
                 <?php if ($employee['GONE']): ?>
@@ -89,8 +93,8 @@
                     foreach ($absolvedEvents as $event) {
                         echo '<tr>';
                         echo '<td><a class="card-link" href="events/detail/'.$event['ID'].'/">';
-                        echo $event['NAME'].'</a></td>';
-                        echo '<td>'.$eventsModel->dtToString($event['BEGINNING']).'</td>';
+                        echo htmlspecialchars($event['NAME']).'</a></td>';
+                        echo '<td>'.format_datetime($event['BEGINNING']).'</td>';
                         if ($event['POSTED']) {
                             echo '<td><i class="fas fa-check"></i></td>';
                         } else {

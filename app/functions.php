@@ -15,10 +15,29 @@ function validateDate($date, bool $past = false): bool {
     return true;
 }
 
+function validateTime($time): bool {
+    $f = 'H:i';
+    $t = DateTime::createFromFormat($f, $time);
+    if(!($t && $t->format($f) == $time)) {
+        return false;
+    }
+    return true;
+}
+
 function invalid_feedback(array $msgs) {
     foreach ($msgs as $msg) {
         echo '<div class="invalid-feedback">';
         echo $msg;
         echo '</div>';
     }
+}
+
+function format_date($date) {
+    $date = date_create($date);
+    return date_format($date, 'd.m.Y');
+}
+
+function format_datetime($datetime) {
+    $date = date_create($datetime);
+    return date_format($date, 'd.m.Y \v\e H:i');
 }

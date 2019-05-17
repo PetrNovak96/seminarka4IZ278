@@ -1,4 +1,7 @@
-<?php $this->header();?>
+<?php
+$this->header();
+$this->render('components/statusBar');
+?>
     <div class="row">
         <div class="col-12">
             <table class="table table-striped table-hover">
@@ -14,7 +17,7 @@
                 foreach ($departments as $department) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="departments/detail/'.$department['ID'].'/">';
-                    echo $department['NAME'].'</a></td>';
+                    echo htmlspecialchars($department['NAME']).'</a></td>';
                     echo '<td>'.$department['DIRECT_NUMBER'].'</td>';
                     echo '<td>'.$department['ALL_NUMBER'].'</td>';
                     echo '</tr>';

@@ -1,30 +1,19 @@
-
-
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    border-radius: 5px;
-    overflow: hidden;
-    background-color: #649df2;
+.report {
+    cursor: pointer;
 }
 
-li {
-    float: left;
+.navigace {
+    margin-bottom: 20px;
+    line-height: 1.0;
 }
 
-li a {
-    display: inline-block;
-    color: whitesmoke;
+.informace td:nth-child(1) {
     font-weight: bold;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
+    text-align: left;
 }
 
-li a:hover {
-    background-color: whitesmoke;
-    color: #649df2;
+.informace td:nth-child(2) {
+    text-align: right;
 }
 
 #footer {

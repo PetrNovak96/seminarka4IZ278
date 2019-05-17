@@ -6,7 +6,7 @@ namespace app\model;
 
 use PDO;
 
-class EventsModel extends Model {
+class EventsModel extends EntityModel {
 
     function __construct() {
         parent::__construct();
@@ -23,7 +23,8 @@ FROM EVENTS V
 LEFT JOIN PARTICIPATIONS P
     ON
     P.EVENT_ID = V.ID
-    GROUP BY V.ID;
+WHERE V.DELETED IS NULL
+GROUP BY V.ID;
 SQL;
         $query=self::$pdo->prepare($sql);
         $query->execute();
@@ -42,11 +43,12 @@ SQL;
             } else if ($arr['d'])  {
                 $r .= $this->timeToString($arr['d'], ['den', 'dny', 'dnů']);
             } else {
-                $r .= $this->timeToString($arr['h'], ['hodinu', 'hodiny', 'hodin']);
-                if ($arr['m']) {
+                if ($arr['h'])
+                    $r .= $this->timeToString($arr['h'], ['hodinu', 'hodiny', 'hodin']);
+                if ($arr['h'] && $arr['m'])
                     $r .= ' a ';
+                if ($arr['m'])
                     $r .= $this->timeToString($arr['m'], ['minutu', 'minuty', 'minut']);
-                }
             }
         } else {
             $r .= 'Proběhla před ';
@@ -56,11 +58,13 @@ SQL;
             } else if ($arr['d'])  {
                 $r .= $this->timeToString($arr['d'], ['dnem', 'dny', 'dny']);
             } else {
-                $r .= $this->timeToString($arr['h'], ['hodinou', 'hodinami', 'hodinami']);
-                if ($arr['m']) {
+                if ($arr['h'])
+                    $r .= $this->timeToString($arr['h'], ['hodinou', 'hodinami', 'hodinami']);
+                if ($arr['h'] && $arr['m'])
                     $r .= ' a ';
+                if ($arr['m'])
                     $r .= $this->timeToString($arr['m'], ['minutou', 'minutami', 'minutami']);
-                }
+
             }
         }
         return $r;
@@ -134,11 +138,6 @@ SQL;
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function dtToString($datetime) {
-        $date = date_create($datetime);
-        return date_format($date, 'd.m.Y \v\e H:i');
-    }
-
     public function findEvent($ID) {
         $sql = <<<SQL
 SELECT
@@ -164,5 +163,223 @@ SQL;
         $query = self::$pdo->prepare($sql);
         $query->execute([':id' => $ID]);
         return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function saveEvent(array $event) {
+        //volitelne PLACE, BE_DATE, BE_TIME, EN_DATE, EN_TIME
+        //povinne NAME, DESCRIPTION, CAPACITY, department
+        $place = !empty($event['PLACE']);
+        $be_date = !empty($event['BE_DATE']);
+        $en_date = !empty($event['EN_DATE']);
+        if ($be_date) {
+            $be = $event['BE_DATE'].' '.$event['BE_TIME'];
+        }
+        if ($en_date) {
+            $en = $event['EN_DATE'].' '.$event['EN_TIME'];
+        }
+        $sql = 'INSERT INTO EVENTS(NAME, DESCRIPTION, CAPACITY';
+        $sql.= $place ? ', PLACE' : '';
+        $sql.= $be_date ? ', BEGINNING' : '';
+        $sql.= $en_date ? ', ENDING' : '';
+        $sql.= ', ORGANIZATOR_ID) VALUES(';
+        $sql.= ':name, ';
+        $sql.= ':description, ';
+        $sql.= ':capacity';
+        $sql.= $place ? ', '.':place' : '';
+        $sql.= $be_date ? ', '.':beginning' : '';
+        $sql.= $en_date ? ', '.':ending' : '';
+        $sql.= ', :department);';
+        $data = [
+            ':name' => $event['NAME'],
+            ':description' => $event['DESCRIPTION'],
+            ':capacity' => $event['CAPACITY'],
+            ':department' => $event['department'],
+        ];
+        if ($place) $data[':place'] = $event['PLACE'];
+        if ($be_date) $data[':beginning'] = $be;
+        if ($en_date) $data[':ending'] = $en;
+        $query = self::$pdo->prepare($sql);
+        $query->execute($data);
+    }
+
+    public function updateEvent($ID, array $event) {
+        $place = !empty($event['PLACE']);
+        $be_date = !empty($event['BE_DATE']);
+        $en_date = !empty($event['EN_DATE']);
+        if ($be_date) {
+            $be = $event['BE_DATE'].' '.$event['BE_TIME'];
+        }
+        if ($en_date) {
+            $en = $event['EN_DATE'].' '.$event['EN_TIME'];
+        }
+        $sql = 'UPDATE EVENTS SET ';
+        $sql.= 'NAME = :name, ';
+        $sql.= 'DESCRIPTION = :description, ';
+        $sql.= 'CAPACITY = :capacity, ';
+        $sql.= 'PLACE = ';
+        $sql.= ($place)? ':place' : 'NULL';
+        $sql.= ', ';
+        $sql.= 'BEGINNING = ';
+        $sql.= ($be_date)? ':beginning' : 'NULL';
+        $sql.= ', ';
+        $sql.= 'ENDING = ';
+        $sql.= ($en_date)? ':ending' : 'NULL';
+        $sql.= ', ';
+        $sql.= 'ORGANIZATOR_ID = :department ';
+        $sql.= 'WHERE ID = :id ;';
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':name', $event['NAME'], PDO::PARAM_STR);
+        $query->bindValue(':description', $event['DESCRIPTION'], PDO::PARAM_STR);
+        $query->bindValue(':capacity', $event['CAPACITY'], PDO::PARAM_INT);
+        $query->bindValue(':department', $event['department'], PDO::PARAM_INT);
+        $query->bindValue(':id', $ID, PDO::PARAM_INT);
+        if ($place)
+        $query->bindValue(':place', $event['PLACE'], PDO::PARAM_STR);
+        if ($be_date)
+            $query->bindValue(':beginning', $be, PDO::PARAM_STR);
+        if ($en_date)
+            $query->bindValue(':ending', $en, PDO::PARAM_STR);
+        $query->execute();
+    }
+
+    public function delete($id) {
+        if (!$this->exists($id)) {
+            return 'Akce s ID '.$id.' neexistuje.';
+        } else {
+            $this->setDeleted($id, date('Y-m-d'));
+        }
+    }
+
+    private function setDeleted($id, string $date) {
+        $sql = <<<SQL
+UPDATE EVENTS SET DELETED = :deleted 
+WHERE ID = :event_id;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':event_id', $id, PDO::PARAM_INT);
+        $query->bindValue(':deleted', $date, PDO::PARAM_STR);
+        $query->execute();
+    }
+
+    public function exists($id): bool {
+        $sql = <<<SQL
+SELECT 
+    ID
+FROM EVENTS
+WHERE ID = :id
+AND DELETED IS NULL;    
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':id', $id, PDO::PARAM_INT);
+        $query->execute();
+        return !empty($query->fetch(PDO::FETCH_ASSOC));
+    }
+
+    public function getEvents() {
+        $sql = <<<SQL
+SELECT 
+    ID,
+    NAME
+FROM EVENTS
+WHERE DELETED IS NULL;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateParticipations($formData) {
+        /*'EVENT_ID','participants'*/
+        $eventId = $formData['EVENT_ID'];
+        $participants = $formData['participants'];
+        $employeesModel = new EmployeesModel();
+        $currentParticipants = $employeesModel->findParticipants($eventId);
+        $temp = [];
+        foreach ($currentParticipants as $currentParticipant) {
+            $temp[] = $currentParticipant['ID'];
+        }
+        $currentParticipants = $temp;
+
+        foreach ($participants as $participant) {
+            if (!in_array($participant, $currentParticipants)) {
+                $this->saveParticipation($participant, $eventId);
+            }
+        }
+
+        foreach ($currentParticipants as $currentParticipant) {
+            if (!in_array($currentParticipant, $participants)) {
+                $this->deleteParticipation($currentParticipant, $eventId);
+            }
+        }
+
+    }
+
+    private function saveParticipation($participant, $eventId) {
+        if (!$this->existsParticipation($participant, $eventId)) {
+            $sql = <<<SQL
+INSERT INTO PARTICIPATIONS(
+EMPLOYEE_ID, EVENT_ID
+) VALUES(
+:employee_id, :event_id
+);   
+SQL;
+            $query = self::$pdo->prepare($sql);
+            $query->bindValue(':employee_id', $participant, PDO::PARAM_INT);
+            $query->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+            $query->execute();
+        }
+    }
+
+    private function deleteParticipation($participant, $eventId) {
+        $sql = <<<SQL
+DELETE FROM PARTICIPATIONS
+WHERE EMPLOYEE_ID = :employee_id
+AND 
+EVENT_ID = :event_id;   
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':employee_id', $participant, PDO::PARAM_INT);
+        $query->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+        $query->execute();
+    }
+
+    private function existsParticipation($participant, $eventId) {
+        $sql = <<<SQL
+SELECT 
+    EMPLOYEE_ID
+FROM PARTICIPATIONS
+WHERE EMPLOYEE_ID = :employee_id
+AND EVENT_ID = :event_id;    
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':employee_id', $participant, PDO::PARAM_INT);
+        $query->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+        $query->execute();
+        return !empty($query->fetch(PDO::FETCH_ASSOC));
+    }
+
+    public function report($employeeId, $eventId) {
+        $sql = <<<SQL
+UPDATE PARTICIPATIONS
+SET REPORTED = 1
+WHERE EMPLOYEE_ID = :employee_id
+AND 
+EVENT_ID = :event_id;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->bindValue(':employee_id', $employeeId, PDO::PARAM_INT);
+        $query->bindValue(':event_id', $eventId, PDO::PARAM_INT);
+        $query->execute();
+    }
+
+    public function endedEvent($id) {
+        $event = $this->findEvent($id);
+        if (!empty($event)) {
+            $ending = $event['ENDING'];
+            if ($ending < date('Y-m-d H:i')) {
+                return true;
+            }
+        }
+        return false;
     }
 }

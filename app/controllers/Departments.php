@@ -6,21 +6,20 @@ namespace app\controllers;
 
 class Departments extends EntityController {
 
-    function __construct() {
-        parent::__construct();
-    }
 
-    function defaultRender() {
-        $this->view->render('departments/index');
-    }
 
-    function detail($parameters) {
-        $id = $parameters[0];
-        $this->view->ID = $id;
-        $this->view->render('departments/detail');
-    }
+    function __construct($name) {
+        $deletedMsg = 'Oddělení bylo úspěšně odstraněno.';
+        $deleteErrorMsg = 'Nepodařilo se odstranit oddělení.';
+        $updatedMsg = 'Oddělení bylo úspěšně upraveno.';
+        $createdMsg = 'Bylo úspěšně vytvořeno nové oddělění.';
 
-    function create() {
-        $this->view->render('departments/form');
+        parent::__construct(
+            $name,
+            $deletedMsg,
+            $deleteErrorMsg,
+            $updatedMsg,
+            $createdMsg
+        );
     }
 }

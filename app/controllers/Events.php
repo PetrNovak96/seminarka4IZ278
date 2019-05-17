@@ -4,23 +4,63 @@
 namespace app\controllers;
 
 
+use app\model\EventsModel;
+
 class Events extends EntityController {
 
-    function __construct() {
-        parent::__construct();
+    private $partUpdateMsg;
+
+    function __construct($name) {
+        $deletedMsg = 'Akce byla úspěšně odstraněna.';
+        $deleteErrorMsg = 'Nepodařilo se odstranit akci.';
+        $updatedMsg = 'Údaje akce byly úspěšně upraveny.';
+        $createdMsg = 'Byla vytvořena nová akce.';
+        $this->partUpdateMsg = 'Přihlášky pro akci byly aktualizovány.';
+
+        parent::__construct(
+            $name,
+            $deletedMsg,
+            $deleteErrorMsg,
+            $updatedMsg,
+            $createdMsg
+        );
     }
 
-    function defaultRender() {
-        $this->view->render('events/index');
+    public function apply($parameters) {
+        $id = $parameters[0];
+        $eventsModel = new EventsModel();
+        if (!$eventsModel->exists($id) || $eventsModel->endedEvent($id)) {
+            $errorController = new Error();
+            $errorController->error404();
+        } else {
+            $this->view->ID = $id;
+            $this->view->render('events/apply');
+        }
     }
 
-    function detail($parameters) {
+    public function updatedParticipations($parameters) {
         $id = $parameters[0];
         $this->view->ID = $id;
-        $this->view->render('events/detail');
+        $this->view->info = $this->partUpdateMsg;
+        $this->view->render($this->name.'/detail');
     }
 
-    function create() {
-        $this->view->render('events/form');
+    public function report() {
+        if (!empty($_POST)) {
+            $employeeId = $_POST['employee'];
+            $eventId = $_POST['event'];
+            $eventsModel = new EventsModel();
+            if (!$eventsModel->exists($eventId)) {
+                http_response_code(400);
+            } else {
+                $event = $eventsModel->findEvent($eventId);
+                if ($event['ENDING'] >= date('Y-m-d H:i')) {
+                    http_response_code(400);
+                } else {
+                    $eventsModel->report($employeeId, $eventId);
+                    http_response_code(200);
+                }
+            }
+        }
     }
 }

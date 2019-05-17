@@ -16,7 +16,7 @@
 </head>
 <body>
 <div id="header">
-
+    <?php if ($this->navbar): ?>
     <nav class="navigace navbar navbar-expand-md navbar-dark bg-dark">
 
         <button class="navbar-toggler"
@@ -28,6 +28,23 @@
 
         <div class="collapse navbar-collapse" id="collapse_target">
             <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="#" data-toggle="modal" data-target="#logoutModal"  class="nav-link">Odhlásit se</a>
+                </li>
+                <div class="modal fade" id="logoutModal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <b>Opravdu si přejete odhlásit se?</b>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-light" data-dismiss="modal">Ne</button>
+                                <button onclick="onLogOut();"
+                                        class="btn btn-primary" data-dismiss="modal">Ano</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <li class="nav-item">
                     <a href="index" class="nav-link">Dashboard</a>
                 </li>
@@ -70,6 +87,7 @@
             </ul>
         </div>
     </nav>
+    <?php endif; ?>
 </div>
 
 <div id="content">

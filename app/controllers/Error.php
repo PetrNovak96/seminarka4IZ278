@@ -12,7 +12,7 @@ class Error extends Controller {
 
     public function error404() {
         $this->view->msg = 'Page does not exists';
-        $this->view->render('error/index');
+        $this->view->render('error/404');
     }
 
     function defaultRender() {

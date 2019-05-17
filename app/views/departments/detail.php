@@ -5,11 +5,15 @@ $department = $departmentsModel->findDepartment($this->ID);
 $employeesModel = new \app\model\EmployeesModel();
 $members = $employeesModel->getMembers($this->ID);
 $subdepartments = $departmentsModel->getSubdepartments($this->ID);
+$this->render('components/statusBar');
+$this->link = 'departments';
+$this->type = 'oddělení';
+$this->render('components/detailBtnGroup');
 ?>
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
             <h1>
-                <?php echo $department['NAME'];?>
+                <?php echo htmlspecialchars($department['NAME']);?>
             </h1>
         </div>
         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -18,18 +22,18 @@ $subdepartments = $departmentsModel->getSubdepartments($this->ID);
                     <td>Vedoucí:</td>
                     <td><?php
                         echo '<a class="card-link" href="employees/detail/'.$department['HEAD_ID'].'">';
-                        echo $department['HEAD_NAME'].' '.$department['SURNAME'];
+                        echo htmlspecialchars($department['HEAD_NAME'].' '.$department['SURNAME']);
                         echo '</a>';
                         ?>
                     </td>
                 </tr>
                 <tr>
                     <td>Místnost:</td>
-                    <td><?php echo $department['ROOM']; ?></td>
+                    <td><?php echo htmlspecialchars($department['ROOM']); ?></td>
                 </tr>
                 <tr>
                     <td>Budova:</td>
-                    <td><?php echo $department['BUILDING']; ?></td>
+                    <td><?php echo htmlspecialchars($department['BUILDING']); ?></td>
                 </tr>
                 <tr>
                     <td>Počet členů oddělení:</td>
@@ -63,9 +67,9 @@ $subdepartments = $departmentsModel->getSubdepartments($this->ID);
             foreach ($members as $member) {
                 echo '<tr>';
                 echo '<td><a class="card-link" href="employees/detail/'.$member['ID'].'">';
-                echo $member['NAME'].' '.$member['SURNAME'];
+                echo htmlspecialchars($member['NAME'].' '.$member['SURNAME']);
                 echo '</a></td>';
-                echo '<td>'.$employeesModel->dToString($member['BEGINNING']).'</td>';
+                echo '<td>'.format_date($member['BEGINNING']).'</td>';
                 echo '</tr>';
             }
             ?>
@@ -84,10 +88,10 @@ $subdepartments = $departmentsModel->getSubdepartments($this->ID);
                 foreach ($subdepartments as $subdepartment) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="departments/detail/'.$subdepartment['ID'].'">';
-                    echo $subdepartment['NAME'];
+                    echo htmlspecialchars($subdepartment['NAME']);
                     echo '</a></td>';
                     echo '<td><a class="card-link" href="employees/detail/'.$subdepartment['HEAD_ID'].'">';
-                    echo $subdepartment['HEAD_NAME'].' '.$subdepartment['HEAD_SURNAME'];
+                    echo htmlspecialchars($subdepartment['HEAD_NAME'].' '.$subdepartment['HEAD_SURNAME']);
                     echo '</a></td>';
                     echo '</tr>';
                 }

@@ -1,3 +1,3 @@
 <?php $this->header();?>
-<h1 class="col-12">Vítejte</h1>
+<h1>ahojky :)</h1>
 <?php $this->footer();?>

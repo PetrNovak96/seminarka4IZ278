@@ -3,9 +3,10 @@
 
 namespace app\model;
 
-use \PDO;
 
-abstract class Model {
+use PDO;
+
+class Model {
 
     protected static $pdo;
 
@@ -17,4 +18,5 @@ abstract class Model {
                 DB_PASSWORD);
         }
     }
+
 }
