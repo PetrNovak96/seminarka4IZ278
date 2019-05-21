@@ -6,8 +6,6 @@ namespace app\controllers;
 
 abstract class EntityController extends Controller {
 
-    //VELKÉ TODO: refaktorovat modely (děděná metoda exists) a controllory,
-    // aby se tu daly kontrolovat existence záznamů a kdyžtak hodit 404
     protected $name;
     protected $deletedMsg;
     protected $deleteErrorMsg;
@@ -21,7 +19,6 @@ abstract class EntityController extends Controller {
         $this->deleteErrorMsg = $deleteErrorMsg;
         $this->updatedMsg = $updatedMsg;
         $this->createdMsg = $createdMsg;
-
     }
 
     public function detail($parameters){
@@ -74,7 +71,12 @@ abstract class EntityController extends Controller {
         $this->view->render($this->name.'/index');
     }
 
-    public function defaultRender() {
+    public function defaultRender($page = null) {
+        if (isset($page)) {
+            $this->view->page = $page;
+        } else {
+            $this->view->page = 0;
+        }
         $this->view->render($this->name.'/index');
     }
 

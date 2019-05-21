@@ -31,7 +31,8 @@ SQL;
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function tableQuery() {
+    public function tableQuery($page = 0) {
+        $offset = $page * 10;
         $sql =
             <<<SQL
 SELECT
@@ -49,9 +50,13 @@ FROM EMPLOYEES E
     V.ID = P.EVENT_ID AND
     V.BEGINNING > CURRENT_TIME
     WHERE E.GONE IS NULL
-    GROUP BY E.ID;
+    GROUP BY E.ID
+    ORDER BY E.SURNAME, E.NAME ASC
+    LIMIT 10
+    OFFSET :offset;
 SQL;
         $query = self::$pdo->prepare($sql);
+        $query->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -100,6 +105,8 @@ ON
 P.EMPLOYEE_ID = E.ID
 AND 
 P.EVENT_ID = :id
+AND 
+E.GONE IS NULL;
 SQL;
         $query = self::$pdo->prepare($sql);
         $query->execute([':id' => $ID]);
@@ -313,5 +320,44 @@ SQL;
         $query = self::$pdo->prepare($sql);
         $query->execute([':id' => $id]);
         return !empty($query->fetch(PDO::FETCH_ASSOC));
+    }
+
+    public function dashboardQuery() {
+        $sql = <<<SQL
+SELECT 
+    E.ID,
+    E.NAME,
+    E.SURNAME,
+    COUNT(P.EVENT_ID) AS NUMBER_REPORTED
+FROM EMPLOYEES E
+JOIN PARTICIPATIONS P 
+ON
+E.ID = P.EMPLOYEE_ID
+AND 
+P.REPORTED = 1
+JOIN EVENTS V
+ON 
+V.ID = P.EVENT_ID
+AND 
+V.DELETED IS NULL
+WHERE E.GONE IS NULL
+GROUP BY E.ID
+ORDER BY NUMBER_REPORTED, E.SURNAME, E.NAME DESC LIMIT 10;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getItemsCount() {
+        $sql = <<<SQL
+SELECT 
+   COUNT(ID) AS COUNT
+FROM EMPLOYEES
+WHERE GONE IS NULL;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 }

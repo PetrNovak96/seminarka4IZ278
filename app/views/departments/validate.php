@@ -1,6 +1,10 @@
 <?php
+
+use app\Token;
+
 $errors = array();
 $classes = array();
+
 //NAME req max 50
 $classes['NAME'] = '';
 if (empty($_POST['NAME'])) {
@@ -38,12 +42,15 @@ if (empty($_POST['HEAD_ID'])) {
     $errors['HEAD_ID'][] = 'Zadejte existujícího vedoucího oddělení.';
 }
 //DEPARTMENT_ID
-$classes['department'] = '';
-if (!empty($_POST['department']) &&
-    !$departmentsModel->exists($_POST['department'])) {
-    $classes['department'] = 'is-invalid';
-    $errors['department'][] = 'Zadejte existujícího oddělení.';
-} elseif (isset($this->ID) && $this->ID == $_POST['department']) {
-    $classes['department'] = 'is-invalid';
-    $errors['department'][] = 'Nadoddělení se nesmí shodovat s oddělením';
+$classes['DEPARTMENT_ID'] = '';
+if (!empty($_POST['DEPARTMENT_ID']) &&
+    !$departmentsModel->exists($_POST['DEPARTMENT_ID'])) {
+    $classes['DEPARTMENT_ID'] = 'is-invalid';
+    $errors['DEPARTMENT_ID'][] = 'Zadejte existujícího oddělení.';
+}
+
+if (empty($_POST['token'])) {
+    $errors['TOKEN'][] = 'Není token...';
+} elseif(!Token::check($_POST['token'])) {
+    $errors['TOKEN'][] = 'Token nesedí...';
 }

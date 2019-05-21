@@ -1,5 +1,7 @@
 <?php
 
+use app\Token;
+
 $formData = [];
 
 if (isset($_POST['email'])) {

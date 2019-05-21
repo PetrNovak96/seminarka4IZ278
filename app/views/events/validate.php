@@ -1,4 +1,7 @@
 <?php
+
+use app\Token;
+
 $errors = array();
 $classes = array();
 
@@ -95,7 +98,7 @@ if (empty($_POST['CAPACITY'])) {
 } elseif (!filter_var($_POST['CAPACITY'], FILTER_VALIDATE_INT) || $_POST['CAPACITY'] < 1) {
     $classes['CAPACITY'] = 'is-invalid';
     $errors['CAPACITY'][] = 'Kapacita akce musí být přirozené číslo.';
-} else {
+} elseif (isset($this->ID)) {
     $employeesModel = new \app\model\EmployeesModel();
     $participants = $employeesModel->findParticipants($this->ID);
     $count = count($participants);
@@ -103,4 +106,10 @@ if (empty($_POST['CAPACITY'])) {
         $classes['CAPACITY'] = 'is-invalid';
         $errors['CAPACITY'][] = 'Počet přihlášených pracovníků ('.$count.') nesmí přesáhnout kapacitu akce.';
     }
+}
+
+if (empty($_POST['token'])) {
+    $errors['TOKEN'][] = 'Není token...';
+} elseif(!Token::check($_POST['token'])) {
+    $errors['TOKEN'][] = 'Token nesedí...';
 }

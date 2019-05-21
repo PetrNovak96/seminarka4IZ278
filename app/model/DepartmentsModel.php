@@ -12,17 +12,21 @@ class DepartmentsModel extends EntityModel {
         parent::__construct();
     }
 
-    public function tableQuery() {
+    public function tableQuery($page = 0) {
+        $offset = $page * 10;
         $sql = <<<SQL
 SELECT
 	D.ID,
 	D.NAME, 
-    COUNT(distinct A1.EMPLOYEE_ID) as DIRECT_NUMBER,
-    COUNT(distinct A2.EMPLOYEE_ID) as ALL_NUMBER
+    COUNT(distinct E1.ID) as DIRECT_NUMBER,
+    COUNT(distinct E2.ID) as ALL_NUMBER
 FROM DEPARTMENTS D
 	LEFT JOIN ASSIGNMENTS A1 
     ON 
     A1.DEPARTMENT_ID = D.ID
+    LEFT JOIN EMPLOYEES E1 
+    ON
+    A1.EMPLOYEE_ID = E1.ID AND E1.GONE IS NULL
     LEFT JOIN ASSIGNMENTS A2 
     ON 
     A2.DEPARTMENT_ID IN (
@@ -34,10 +38,17 @@ FROM DEPARTMENTS D
     AND length(@pv := concat(@pv, ',', ID))
     )
     OR A2.DEPARTMENT_ID = D.ID
+    LEFT JOIN EMPLOYEES E2 
+    ON
+    A2.EMPLOYEE_ID = E2.ID AND E2.GONE IS NULL
     WHERE D.DELETED IS NULL
-    GROUP BY D.ID;
+    GROUP BY D.ID
+    ORDER BY D.NAME ASC
+    LIMIT 10
+    OFFSET :offset;
 SQL;
         $query=self::$pdo->prepare($sql);
+        $query->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -272,5 +283,17 @@ SQL;
         $query = self::$pdo->prepare($sql);
         $query->execute([':id' => $id]);
         return !empty($query->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    public function getItemsCount() {
+        $sql = <<<SQL
+SELECT 
+   COUNT(ID) AS COUNT
+FROM DEPARTMENTS
+WHERE DELETED IS NULL;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 }

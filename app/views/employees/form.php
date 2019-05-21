@@ -1,4 +1,7 @@
 <?php
+
+use app\Token;
+
 $departmentsModel = new \app\model\DepartmentsModel();
 $departments = $departmentsModel->getDepartments();
 $employeesModel = new \app\model\EmployeesModel();
@@ -30,9 +33,10 @@ if (!empty($_POST)) {
             'EMAIL' => $_POST['EMAIL'],
             'BIRTH' => $_POST['BIRTH'],
             'ENTERED' => $_POST['ENTERED'],
-            'departments' => $_POST['departments'],
+            'departments' => @$_POST['departments'],
     ];
     require __DIR__.'/validate.php';
+
     if (empty($errors)) {
         if ((isset($this->ID))) {
             $employeesModel->updateEmloyee($this->ID, $_POST);
@@ -142,6 +146,7 @@ $this->header();
             <?php if(isset($errors['departments'])) invalid_feedback($errors['departments']); ?>
         </div>
     </div>
+    <input type="hidden" name="token" value="<?php echo Token::generate();?>">
     <button type="submit" class="btn btn-secondary"><?php echo isset($this->ID)? 'Upravit' : 'Vytvořit' ?> pracovníka</button>
 </form>
 <?php $this->footer();?>

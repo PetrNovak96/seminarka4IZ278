@@ -1,5 +1,7 @@
 <?php
 
+use app\Token;
+
 $eventsModel = new \app\model\EventsModel();
 $events = $eventsModel->getEvents();
 $employeesModel = new \app\model\EmployeesModel();
@@ -85,6 +87,7 @@ $this->header();
             </div>
         </div>
     </div>
+    <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
     <button type="submit" class="btn btn-secondary">Uložit změny</button>
 </form>
 <?php

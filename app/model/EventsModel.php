@@ -12,7 +12,8 @@ class EventsModel extends EntityModel {
         parent::__construct();
     }
 
-    public function tableQuery() {
+    public function tableQuery($page = 0) {
+        $offset = $page * 10;
         $sql = <<<SQL
 SELECT
 	V.ID,
@@ -21,12 +22,21 @@ SELECT
 	(UNIX_TIMESTAMP(V.BEGINNING)) as TIME
 FROM EVENTS V
 LEFT JOIN PARTICIPATIONS P
-    ON
-    P.EVENT_ID = V.ID
+ON
+P.EVENT_ID = V.ID
+LEFT JOIN EMPLOYEES E
+ON 
+E.ID = P.EMPLOYEE_ID
 WHERE V.DELETED IS NULL
-GROUP BY V.ID;
+AND 
+E.GONE IS NULL
+GROUP BY V.ID
+ORDER BY V.NAME ASC
+LIMIT 10
+OFFSET :offset;
 SQL;
         $query=self::$pdo->prepare($sql);
+        $query->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -104,7 +114,9 @@ JOIN PARTICIPATIONS P
 ON
 P.EVENT_ID = V.ID
 AND
-P.EMPLOYEE_ID = :id ;
+P.EMPLOYEE_ID = :id
+AND 
+V.ENDING > CURRENT_TIMESTAMP;
 SQL;
         $query=self::$pdo->prepare($sql);
         $query->execute([':id' => $ID]);
@@ -381,5 +393,68 @@ SQL;
             }
         }
         return false;
+    }
+
+    public function getParticipationsStatistic() {
+        $sql = <<<SQL
+SELECT 
+    COUNT(P1.EMPLOYEE_ID) AS REPORTED,
+    COUNT(P2.EMPLOYEE_ID) AS UNREPORTED
+FROM EVENTS E 
+LEFT JOIN PARTICIPATIONS P1
+ON E.ID = P1.EVENT_ID
+AND P1.REPORTED = 1
+LEFT JOIN PARTICIPATIONS P2
+ON E.ID = P2.EVENT_ID
+AND P2.REPORTED IS NULL
+WHERE E.ENDING < CURRENT_TIMESTAMP;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function lastEvents() {
+        $sql = <<<SQL
+SELECT 
+    ID,
+    NAME,
+    ENDING
+FROM EVENTS
+WHERE DELETED IS NULL
+AND ENDING < CURRENT_TIMESTAMP
+ORDER BY ENDING DESC LIMIT 10;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function nextEvents() {
+        $sql = <<<SQL
+SELECT 
+    ID,
+    NAME,
+    BEGINNING
+FROM EVENTS
+WHERE DELETED IS NULL
+AND BEGINNING > CURRENT_TIMESTAMP
+ORDER BY BEGINNING ASC LIMIT 10;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getItemsCount() {
+        $sql = <<<SQL
+SELECT 
+   COUNT(ID) AS COUNT
+FROM EVENTS
+WHERE DELETED IS NULL;
+SQL;
+        $query = self::$pdo->prepare($sql);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 }

@@ -13,4 +13,8 @@ abstract class EntityModel extends Model {
     public abstract function delete($id);
 
     public abstract function exists($id);
+
+    public abstract function tableQuery($page);
+
+    public abstract function getItemsCount();
 }

@@ -5,7 +5,8 @@ namespace app\views;
 
 class View {
 
-    function __construct() {}
+    function __construct() {
+    }
 
     public function render($name) {
         require __DIR__.'/'.$name.'.php';

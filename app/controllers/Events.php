@@ -63,4 +63,10 @@ class Events extends EntityController {
             }
         }
     }
+
+    public function getParticipationsStatistic() {
+        $eventsModel = new EventsModel();
+        $data = $eventsModel->getParticipationsStatistic();
+        echo json_encode($data);
+    }
 }

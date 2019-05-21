@@ -1,6 +1,7 @@
 <?php
 $this->header();
 $this->render('components/statusBar');
+$this->page = (isset($this->page)) ? $this->page : 0;
 ?>
     <div class="row">
         <div class="col-12">
@@ -13,7 +14,7 @@ $this->render('components/statusBar');
                 <?php
 
                 $eventsModel = new \app\model\EventsModel();
-                $events = $eventsModel->tableQuery();
+                $events = $eventsModel->tableQuery($this->page);
                 foreach ($events as $event) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="events/detail/'.$event['ID'].'/">';
@@ -26,4 +27,7 @@ $this->render('components/statusBar');
             </table>
         </div>
     </div>
-<?php $this->footer();?>
+<?php
+$this->link = 'events';
+$this->render('components/pagination');
+$this->footer();?>

@@ -1,4 +1,7 @@
 <?php
+
+use app\Token;
+
 $errors = array();
 $classes = array();
 
@@ -52,4 +55,10 @@ if (!empty($_POST['departments'])) {
             $errors['departments'][] = 'Oddělení s ID '.$department.' neexistuje.';
         }
     }
+}
+
+if (empty($_POST['token'])) {
+    $errors['TOKEN'][] = 'Není token...';
+} elseif(!Token::check($_POST['token'])) {
+    $errors['TOKEN'][] = 'Token nesedí...';
 }

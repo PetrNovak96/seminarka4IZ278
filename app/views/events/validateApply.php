@@ -1,6 +1,6 @@
 <?php
-//$errors -> participants, event
-//$classes -> participants, event
+
+use app\Token;
 
 $errors = array();
 $classes = array();
@@ -30,4 +30,10 @@ if(!empty($_POST['participants'])) {
             }
         }
     }
+}
+
+if (empty($_POST['token'])) {
+    $errors['TOKEN'][] = 'Není token...';
+} elseif(!Token::check($_POST['token'])) {
+    $errors['TOKEN'][] = 'Token nesedí...';
 }

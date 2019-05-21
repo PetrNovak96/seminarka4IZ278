@@ -1,4 +1,7 @@
 <?php
+
+use app\Token;
+
 $eventsModel = new \app\model\EventsModel();
 $departmentsModel = new \app\model\DepartmentsModel();
 $departments = $departmentsModel->getDepartments();
@@ -188,6 +191,7 @@ $this->header();
             </div>
         </div>
     </div>
+    <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
     <button type="submit" class="btn btn-secondary"><?php echo isset($this->ID)? 'Upravit' : 'Vytvořit' ?> akci</button>
 </form>
 <?php $this->footer();?>

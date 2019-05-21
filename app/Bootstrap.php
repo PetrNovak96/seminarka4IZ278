@@ -22,6 +22,8 @@ class Bootstrap {
                 if (isset($url[1]) && method_exists($instance, $url[1])) {
                     $parameters = array_slice($url, 2);
                     $instance->{$url[1]}($parameters);
+                } elseif(isset($url[1]) && is_numeric($url[1])) {
+                    $instance->defaultRender($url[1]);
                 } elseif (!isset($url[1])) {
                     $instance->defaultRender();
                 } else {

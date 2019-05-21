@@ -1,6 +1,7 @@
 <?php
 $this->header();
 $this->render('components/statusBar');
+$this->page = (isset($this->page)) ? $this->page : 0;
 ?>
     <div class="row">
         <div class="col-12">
@@ -13,7 +14,7 @@ $this->render('components/statusBar');
                 <?php
 
                 $employeesModel = new \app\model\EmployeesModel();
-                $employees = $employeesModel->tableQuery();
+                $employees = $employeesModel->tableQuery($this->page);
                 foreach ($employees as $employee) {
                     echo '<tr>';
                     echo '<td><a class="card-link" href="employees/detail/'.$employee['ID'].'/">';
@@ -27,4 +28,7 @@ $this->render('components/statusBar');
             </table>
         </div>
     </div>
-<?php $this->footer();?>
+<?php
+$this->link = 'employees';
+$this->render('components/pagination');
+$this->footer();?>

@@ -1,4 +1,7 @@
 <?php
+
+use app\Token;
+
 $departmentsModel = new \app\model\DepartmentsModel();
 $employeesModel = new \app\model\EmployeesModel();
 $departments = $departmentsModel->getDepartments();
@@ -29,10 +32,10 @@ if (!empty($_POST)) {
     if (empty($errors)) {
         if ((isset($this->ID))) {
             $departmentsModel->updateDepartment($this->ID, $_POST);
-            //header('Location: /~novp19/departments/edited/'.$this->ID.'/');
+            header('Location: /~novp19/departments/edited/'.$this->ID.'/');
         } else {
             $departmentsModel->saveDepartment($_POST);
-            //header('Location: /~novp19/departments/created/');
+            header('Location: /~novp19/departments/created/');
         }
     }
 }
@@ -44,7 +47,7 @@ $this->header();?>
             <input type="text" name="NAME" id="name" class="form-control
             <?php echo (isset($classes['NAME'])) ? $classes['NAME'] : ''; ?>
             " required maxlength="50"
-            value="<?php echo isset($formData['NAME'])? htmlspecialchars($formData['NAME']) : ''; ?>"
+            value="<?php echo isset($formData['NAME'])? $formData['NAME'] : ''; ?>"
             >
             <?php if(isset($errors['NAME'])) invalid_feedback($errors['NAME']); ?>
         </div>
@@ -59,16 +62,11 @@ $this->header();?>
                         "
                         id="department">
                     <?php
-
-                    echo '<option value="0"';
-                    if (isset($formData['department'])) echo ' selected="selected"';
-                    echo '>Žádné</option>';
                     foreach ($departments as $department) {
-                        if (isset($this->ID) && $department['ID'] == $this->ID) continue;
                         echo '<option value="'.$department['ID'].'"';
                         echo (isset($formData['department']) && $formData['department'] == $department['ID'])?
                         'selected="selected"' : '';
-                        echo '>'.htmlspecialchars($department['NAME']);
+                        echo '>'.$department['NAME'];
                         echo '</option>';
                     }
                     ?>
@@ -83,7 +81,7 @@ $this->header();?>
             <input type="text" name="ROOM" id="room" class="form-control
             <?php echo (isset($classes['ROOM'])) ? $classes['ROOM'] : ''; ?>
             " required maxlength="50"
-            value="<?php echo isset($formData['ROOM'])? htmlspecialchars($formData['ROOM']) : ''; ?>"
+            value="<?php echo isset($formData['ROOM'])? $formData['ROOM'] : ''; ?>"
             >
             <?php if(isset($errors['ROOM'])) invalid_feedback($errors['ROOM']); ?>
         </div>
@@ -94,7 +92,7 @@ $this->header();?>
             <input type="text" name="BUILDING" id="building" class="form-control
             <?php echo (isset($classes['BUILDING'])) ? $classes['BUILDING'] : ''; ?>
             " required maxlength="50"
-            value="<?php echo isset($formData['BUILDING'])? htmlspecialchars($formData['BUILDING']) : ''; ?>"
+            value="<?php echo isset($formData['BUILDING'])? $formData['BUILDING'] : ''; ?>"
             >
             <?php if(isset($errors['BUILDING'])) invalid_feedback($errors['BUILDING']); ?>
         </div>
@@ -114,7 +112,7 @@ $this->header();?>
                         echo (isset($formData['HEAD_ID']) &&
                             $formData['HEAD_ID'] == $employee['ID'])?
                         'selected="selected"' : '';
-                        echo '>'.htmlspecialchars($employee['NAME'].' '.$employee['SURNAME']);
+                        echo '>'.$employee['NAME'].' '.$employee['SURNAME'];
                         echo '</option>';
                     }
                     ?>
@@ -123,6 +121,7 @@ $this->header();?>
             </div>
         </div>
     </div>
+    <input type="hidden" name="token" value="<?php echo Token::generate(); ?>">
     <button type="submit" class="btn btn-secondary"><?php echo isset($this->ID)? 'Upravit' : 'Vytvořit' ?> oddělení</button>
 </form>
 <?php $this->footer();?>
