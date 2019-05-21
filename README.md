@@ -1,5 +1,5 @@
 # Seminárka pro 4IZ278
-##Skript pro databázi
+## Skript pro databázi
 ```
 CREATE TABLE IF NOT EXISTS EMPLOYEES (
 	ID int(11) NOT NULL AUTO_INCREMENT,
